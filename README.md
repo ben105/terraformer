@@ -1,7 +1,11 @@
 # terraformer
 Terraforms new applications.
 
-## Initializing
+*I need to make the distinction between the root terraformer and root infrastructure, and the infrastructure that needs to be spun up.*
+
+*I need to differentiate between the initial root terraformer and root infrastructure install steps, which should only happen once, and the steps to initialize a new project, which will happen N times.*
+
+## Prepare the Infrastructure
 
 ### Set up your GCP configuration to use the project that you will be working with:
 ```bash
@@ -67,7 +71,7 @@ gsutil mb -l gs://testapp-dev-tf-state
 gsutil versioning set on gs://testapp-dev-tf-state
 ```
 
-## General Setup
+## Terraform Setup
 
 ```
 tf-code
@@ -92,7 +96,7 @@ tf-code
 
 ### main.tf
 ```tf
-provider “google” {
+provider "google" {
   project = var.project_id
   region = var.region
   zone = var.zone
@@ -100,3 +104,51 @@ provider “google” {
 }
 ```
 
+### testapp-dev.tfvars
+```
+project_id = "demo-sbx-tf-state"
+region = "us-west1"
+zone = "us-west1-a"
+tf_service_account = "SERVICE_ACCOUNT@PROJECT_ID.iam.gserviceaccount.com"
+```
+
+### testapp-dev.backend
+```
+bucket = "testapp-dev-tf-state"
+prefix = "static.tfstate.d"
+impersonate_service_account = "SERVICE_ACCOUNT@PROJECT_ID.iam.gserviceaccount.com"
+```
+
+### version.tf
+
+This will enable you to keep track of exactly which version of Terraform you are using and each provider that is required.
+```tf
+terraform {
+   required_version = "~>0.14.0"
+   backend "gcs" {}
+   required_providers {
+      google = {
+         source = "hashicorp/google"
+         version = "~>3.64.0"
+      }
+   }
+}
+```
+
+### Initialise the Terraform code
+```bash
+terraform init -backend-config=testapp-dev.backend
+```
+
+### Create a workspace
+```bash
+terraform workspace new testapp-dev
+```
+
+### Plan and apply
+
+*This is for the testapp, but I also want to seperate out how to plan/apply the root infrastructure and terraformer.*
+
+```bash
+terraform plan –out tf.plan –var-file=testapp-dev.tfvars
+```

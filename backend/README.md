@@ -9,7 +9,7 @@
 # A sample microservice in Go packaged into a container image.
 
 # The official Go image that already has all necessary tools and libraries to compile and run a Go application.
-FROM golang:1.19
+FROM golang:1.21.4
 
 WORKDIR /app
 

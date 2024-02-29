@@ -2,3 +2,6 @@
 tf/*.backend
 tf/*.tfvars
 .terraform
+
+# Python
+virtual_env

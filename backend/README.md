@@ -63,13 +63,13 @@ gcloud auth configure-docker us-west1-docker.pkg.dev
 Build and tag the Docker container image.
 
 ```bash
-docker build -t us-west1-docker.pkg.dev/terraformer/terraformer-server-repo/app:${VERSION} .
+docker build -t us-west1-docker.pkg.dev/terraformer-415819/terraformer-app-repo/app:${VERSION} .
 ```
 
 Push the container image to Artifact Registry.
 
 ```bash
-docker push us-west1-docker.pkg.dev/terraformer/terraformer-server-repo/app:${VERSION}
+docker push us-west1-docker.pkg.dev/terraformer-415819/terraformer-app-repo/app:${VERSION}
 ```
 
 ## Authenticating Users with Go

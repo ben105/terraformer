@@ -21,3 +21,11 @@ resource "google_compute_network" "vpc_network" {
   project = var.project
   name    = "vpc-network"
 }
+
+resource "google_artifact_registry_repository" "terraformer-app-repo" {
+  project       = var.project
+  location      = "us-west1"
+  repository_id = "terraformer-app-repo"
+  description   = "Artifact registry repository for application Docker images"
+  format        = "DOCKER"
+}

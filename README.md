@@ -124,14 +124,30 @@ impersonate_service_account = "SERVICE_ACCOUNT@PROJECT_ID.iam.gserviceaccount.co
 This will enable you to keep track of exactly which version of Terraform you are using and each provider that is required.
 ```tf
 terraform {
-   required_version = "~>0.14.0"
+   required_version = ">= 1.3.0"
    backend "gcs" {}
    required_providers {
       google = {
-         source = "hashicorp/google"
-         version = "~>3.64.0"
+         source  = "hashicorp/google"
+         version = ">= 5.10.0"
+      }
+      google-beta = {
+         source  = "hashicorp/google-beta"
+         version = ">= 5.10.0"
       }
    }
+}
+
+data "google_project" "project" {
+  project_id = var.project
+}
+
+data "google_app_engine_default_service_account" "appengine-default" {
+  project = var.project
+}
+
+resource "google_compute_network" "vpc_network" {
+  name = "vpc-network"
 }
 ```
 

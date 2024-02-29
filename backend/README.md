@@ -1,6 +1,57 @@
-# Authenticating Users with Go
+# Setting Up the Backend
 
-## Validate Assertion
+## Dockerfile for Go Apps
+
+### Example Dockerfile
+
+```docker
+# syntax=docker/dockerfile:1
+# A sample microservice in Go packaged into a container image.
+
+# The official Go image that already has all necessary tools and libraries to compile and run a Go application.
+FROM golang:1.19
+
+WORKDIR /app
+
+# Note, that the base image has the toolchain already, but the source code isn't in the workdir yet.
+# So before running go mod download inside this image, we need to get the go.mod and go.sum files.
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code.
+COPY *.go ./
+
+# The result of that command will be a static application binary named go-app.
+RUN CGO_ENABLED=0 GOOS=linux go build -o /go-app
+
+EXPOSE 8080
+
+CMD ["/go-app"]
+```
+
+### Build the Image
+
+Now that you've created your Dockerfile, build an image from it. The docker build command creates Docker images from the Dockerfile and a context. A build context is the set of files located in the specified path or URL. The Docker build process can access any of the files located in the context.
+
+The build command optionally takes a --tag flag. This flag is used to label the image with a string value, which is easy for humans to read and recognize. If you don't pass a --tag, Docker will use latest as the default value.
+
+```bash
+docker build --tag go-app .
+```
+
+### Run Go Image as a Container
+
+A container is a normal operating system process except that this process is isolated and has its own file system, its own networking, and its own isolated process tree separate from the host.
+
+To run an image inside of a container, you use the docker run command. It requires one parameter and that's the image name. Start your image and make sure it's running correctly. Run the following command in your terminal.
+
+```bash
+docker run go-app
+```
+
+## Authenticating Users with Go
+
+### Validate Assertion
 
 The validateAssertion function validates the assertion was properly signed and returns the associated email address and user ID.
 
@@ -39,6 +90,7 @@ func validateAssertion(assertion string, certs map[string]string, aud string) (e
 ```
 
 ### Get the certificates
+
 ```go
 // certificates returns Cloud IAP's cryptographic public keys.
 func certificates() (map[string]string, error) {
@@ -62,6 +114,7 @@ func certificates() (map[string]string, error) {
 ```
 
 ### Get the audience
+
 ```go
 // audience returns the expected audience value for this service.
 func audience() (string, error) {

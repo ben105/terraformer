@@ -49,6 +49,29 @@ To run an image inside of a container, you use the docker run command. It requir
 docker run go-app
 ```
 
+### Building and Deploying Docker Image to GCP
+
+### Uploading Docker Container
+
+_You should only need to do this step once._ To set up authentication to Docker repositories in the region `us-central1`
+, run the following command:
+
+```bash
+gcloud auth configure-docker us-west1-docker.pkg.dev
+```
+
+Build and tag the Docker container image.
+
+```bash
+docker build -t us-west1-docker.pkg.dev/terraformer/terraformer-server-repo/app:${VERSION} .
+```
+
+Push the container image to Artifact Registry.
+
+```bash
+docker push us-west1-docker.pkg.dev/terraformer/terraformer-server-repo/app:${VERSION}
+```
+
 ## Authenticating Users with Go
 
 ### Validate Assertion

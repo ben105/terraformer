@@ -1,4 +1,4 @@
-package {{app_name}}
+package main
 
 import (
 	"context"
@@ -11,7 +11,6 @@ import (
 	"google.golang.org/api/idtoken"
 )
 
-// audience returns the expected audience value for this service.
 func audience() (string, error) {
 	projectNumber, err := metadata.NumericProjectID()
 	if err != nil {
@@ -26,17 +25,11 @@ func audience() (string, error) {
 	return "/projects/" + projectNumber + "/apps/" + projectID, nil
 }
 
-// Middleware function that will be called each time
 func AuthenticationMiddleware(next http.Handler) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-				http.NotFound(w, r)
-				return
-		}
-
 		assertion := r.Header.Get("X-Goog-IAP-JWT-Assertion")
 		if assertion == "" {
-				fmt.Fprintln(w, "No Cloud IAP header found.")
+				log.Println("No Cloud IAP header found.")
 				http.Error(w, "Forbidden", http.StatusForbidden)
 				return
 		}

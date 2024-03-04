@@ -1,4 +1,4 @@
-package {{app_name}}
+package main
 
 import (
 	"context"
@@ -18,8 +18,11 @@ func main() {
     flag.Parse()
 
     r := mux.NewRouter()
-	r.Use(AuthenticationMiddleware)
-    // Add more routes as needed...
+    r.HandleFunc("/healthz", startupProbe)
+    api := r.PathPrefix("/{{app_name}}/api").Subrouter()
+	api.Use(AuthenticationMiddleware)
+    api.HandleFunc("/hello", hello)
+    // Add more api routes as needed...
 
     srv := &http.Server{
         Addr:         "0.0.0.0:8080",
@@ -55,4 +58,12 @@ func main() {
 
     log.Println("shutting down")
     os.Exit(0)
+}
+
+func startupProbe(w http.ResponseWriter, r *http.Request) {
+    w.Write([]byte("200 - Successfully started!"))
+}
+
+func hello(w http.ResponseWriter, r *http.Request) {
+    w.Write([]byte("Hello, world!"))
 }

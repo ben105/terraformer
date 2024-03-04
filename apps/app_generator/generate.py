@@ -11,7 +11,7 @@ def generate_app(app_name):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print('Usage: ./run.py app-name')
+        print('Usage: ./generate.py app-name')
         sys.exit(1)
     app_name = sys.argv[1]
     if len(app_name) == 0:

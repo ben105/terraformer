@@ -1,3 +1,7 @@
+# Testing
+apps/test
+releases/test
+
 # Terraform
 tf/*.backend
 tf/*.tfvars

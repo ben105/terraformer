@@ -65,4 +65,13 @@ module "frontends" {
   }
 }
 
+module "networking" {
+  source = "./networking"
+
+  project = var.project
+  backends = [for be in module.backends : {
+    host    = be.host
+    name    = be.name
+    service = be.service
+  }]
 }

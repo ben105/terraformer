@@ -1,3 +1,17 @@
+locals {
+  backend-releases-content = [for file-name in fileset("../releases", "**/backend.release") : trimspace(file("../releases/${file-name}"))]
+  backend-releases = [for content in local.backend-releases-content : {
+    name = split(":", content)[0]
+    tag  = split(":", content)[1]
+  }]
+
+  frontend-releases-content = [for file-name in fileset("../releases", "**/frontend.release") : trimspace(file("../releases/${file-name}"))]
+  frontend-releases = [for content in local.backend-releases-content : {
+    name = split(":", content)[0]
+    tag  = split(":", content)[1]
+  }]
+}
+
 terraform {
   required_version = ">= 1.3.0"
   backend "gcs" {}
@@ -22,10 +36,33 @@ resource "google_compute_network" "vpc_network" {
   name    = "vpc-network"
 }
 
-resource "google_artifact_registry_repository" "terraformer-app-repo" {
-  project       = var.project
-  location      = "us-west1"
-  repository_id = "terraformer-app-repo"
-  description   = "Artifact registry repository for application Docker images"
-  format        = "DOCKER"
+module "backends" {
+  source = "./app"
+
+  for_each = { for release in local.backend-releases : "${release.name}-be" => release.tag }
+
+  project = var.project
+  region  = var.region
+
+  name = each.key
+  tag  = each.value
+}
+
+module "frontends" {
+  source = "./app"
+
+  for_each = { for release in local.frontend-releases : "${release.name}-fe" => release.tag }
+
+  project = var.project
+  region  = var.region
+
+  name = each.key
+  tag  = each.value
+
+  iap = {
+    id     = google_iap_client.iap_client.client_id
+    secret = google_iap_client.iap_client.secret
+  }
+}
+
 }
